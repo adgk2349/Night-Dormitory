@@ -2,6 +2,19 @@
 
 Target length: 2:30-3:00.
 
+Generated demo video:
+
+https://adgk2349.github.io/Night-Dormitory/demo/night-dormitory-demo.webm
+
+Regenerate locally:
+
+```bash
+npm run dev
+npm run record:demo
+```
+
+The automated capture uses `#showcase` to show the title, story preview, room, bathroom, memory event, corridor/elevator, first-floor rice cooker area, and loop ending within the three-minute limit.
+
 ## 0:00-0:15
 
 - Show title screen.

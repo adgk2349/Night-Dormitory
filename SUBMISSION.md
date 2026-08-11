@@ -17,6 +17,10 @@
 Recommended video flow is documented in `DEMO_VIDEO_PLAN.md`.
 The submitted video should be under three minutes and include the story preview, room exploration, memory fragments, corridor elevator, shared rice-cooker area, and loop ending.
 
+Generated demo video link:
+
+https://adgk2349.github.io/Night-Dormitory/demo/night-dormitory-demo.webm
+
 ## Hackathon Build Scope
 
 This version focuses on a 10-15 minute vertical slice rather than the full two-hour game structure.

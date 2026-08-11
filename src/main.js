@@ -37,6 +37,10 @@ const game = {
   pitchTarget: 0,
   bobX: 0,
   riceEndingPulse: 0,
+  showcase: {
+    active: false,
+    timers: [],
+  },
 };
 
 const publicAsset = (path) => `${import.meta.env.BASE_URL}${path}`;
@@ -1023,7 +1027,18 @@ function startGame() {
   applyDebugStartHash();
 }
 
+function setCameraView(position, yaw, pitch = 0) {
+  camera.position.copy(position);
+  camera.rotation.set(pitch, yaw, 0);
+  game.yawTarget = yaw;
+  game.pitchTarget = pitch;
+}
+
 function applyDebugStartHash() {
+  if (location.hash === '#showcase') {
+    startShowcase();
+    return;
+  }
   if (location.hash === '#bathroom') {
     storyPreviewEl.classList.add('hidden');
     game.introActive = false;
@@ -1052,6 +1067,77 @@ function applyDebugStartHash() {
     enterCorridor();
     useElevator();
   }
+}
+
+function queueShowcase(ms, action) {
+  const timer = setTimeout(action, ms);
+  game.showcase.timers.push(timer);
+}
+
+function startShowcase() {
+  game.showcase.active = true;
+  game.keys.clear();
+  showStoryPreview();
+  setObjective('데모 캡처: 고시텔 방을 확인하자.');
+  queueShowcase(700, () => setCameraView(new THREE.Vector3(-2.78, 1.62, 0.18), 0));
+  queueShowcase(2900, () => setCameraView(new THREE.Vector3(-2.35, 1.6, -1.4), -0.18));
+  queueShowcase(5200, () => {
+    say('세로로 긴 창문 아래로 2층 도로의 빛이 번진다.');
+    setCameraView(new THREE.Vector3(-2.2, 1.56, -2.75), -0.08);
+  });
+  queueShowcase(8100, () => {
+    setCameraView(new THREE.Vector3(-0.58, 1.56, -3.9), -1.55);
+    setObjective('화장실 문을 열어 안쪽을 확인하자.');
+    game.bathroomDoorOpen = true;
+    openDoor(game.bathroomDoor, true);
+    game.bathroomLight = true;
+    applyLightState();
+    say('문 뒤에는 젖은 타일 냄새가 남아 있다.');
+  });
+  queueShowcase(11200, () => setCameraView(new THREE.Vector3(1.08, 1.54, -2.85), -0.25));
+  queueShowcase(14500, () => {
+    setCameraView(new THREE.Vector3(-2.8, 1.58, -3.35), -0.2);
+    say('책상 위 컵과 어두운 모니터가 그대로 놓여 있다.');
+  });
+  queueShowcase(17200, () => {
+    setRoomState(1);
+    triggerChairEvent();
+    setCameraView(new THREE.Vector3(-2.45, 1.58, -2.35), -0.62);
+    setObjective('방 안의 배치가 조금 어긋났다.');
+  });
+  queueShowcase(21500, () => {
+    setRoomState(3);
+    game.exitUnlocked = true;
+    setObjective('현관문이 열릴 것 같다.');
+    say('현관 쪽에서 잠금이 풀리는 소리가 났다.');
+    setCameraView(new THREE.Vector3(-1.05, 1.62, 0.42), 2.98);
+  });
+  queueShowcase(25500, () => {
+    enterCorridor();
+    setCameraView(new THREE.Vector3(-0.38, 1.62, 6.72), -1.58);
+  });
+  queueShowcase(29200, () => {
+    triggerSlippersEvent();
+    setCameraView(new THREE.Vector3(-0.72, 1.56, 7.35), -1.22);
+  });
+  queueShowcase(33500, () => {
+    setCameraView(new THREE.Vector3(-0.45, 1.58, 8.7), 0.05);
+    setObjective('복도 끝과 204호 앞 생활감을 확인하자.');
+  });
+  queueShowcase(38000, () => {
+    setCameraView(new THREE.Vector3(0.65, 1.58, 7.75), -1.58);
+    say('엘리베이터 버튼 불빛만 바로 옆에서 켜져 있다.');
+  });
+  queueShowcase(42000, () => {
+    useElevator();
+    setCameraView(new THREE.Vector3(0.2, 1.62, 21.35), 3.08);
+  });
+  queueShowcase(46200, () => setCameraView(new THREE.Vector3(-0.35, 1.58, 23.25), 3.04));
+  queueShowcase(50500, () => {
+    setCameraView(new THREE.Vector3(-0.72, 1.52, 23.88), 3.08);
+    setObjective('1층 밥솥의 보온등을 확인하자.');
+  });
+  queueShowcase(54800, () => useRiceCooker());
 }
 
 function showStoryPreview() {
