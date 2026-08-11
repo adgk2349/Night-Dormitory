@@ -11,12 +11,13 @@ Target length: 2:30-3:00.
 ## 0:15-0:45
 
 - Walk through the room slowly.
-- Show the rebuilt narrow goshiwon layout: left bed, back window with exterior facade, wall AC, desk/drawer, chair, fan, fluorescent light, and wood/vinyl floor.
+- Show the rebuilt narrow goshiwon layout: left bed, vertical window with road/exterior facade, wall AC, desk opposite the bed, chair, fan, fluorescent light, and wood/vinyl floor.
 - Turn a light switch on/off once.
 
 ## 0:45-1:25
 
-- Interact with the bedroom/bathroom door.
+- Interact with the bathroom door and briefly show the tiled sink/toilet/shower space.
+- Interact with the bedroom/closet door.
 - Collect the first memory fragment.
 - Show the objective changing and the chair repositioning after the memory fragment.
 

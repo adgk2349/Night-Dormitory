@@ -39,16 +39,18 @@ const game = {
   riceEndingPulse: 0,
 };
 
+const publicAsset = (path) => `${import.meta.env.BASE_URL}${path}`;
+
 const assets = {
   audio: {
-    fluorescent: '/audio/fluorescent_hum.m4a',
-    corridor: '/audio/corridor_ambience.m4a',
-    doorClose: '/audio/door_close.wav',
-    elevatorButton: '/audio/elevator_button.m4a',
-    elevatorDoor: '/audio/elevator_door.m4a',
-    elevatorDing: '/audio/elevator_ding.mp3',
-    footstep: '/audio/footstep_wood.m4a',
-    lightSwitch: '/audio/light_switch.m4a',
+    fluorescent: publicAsset('audio/fluorescent_hum.m4a'),
+    corridor: publicAsset('audio/corridor_ambience.m4a'),
+    doorClose: publicAsset('audio/door_close.wav'),
+    elevatorButton: publicAsset('audio/elevator_button.m4a'),
+    elevatorDoor: publicAsset('audio/elevator_door.m4a'),
+    elevatorDing: publicAsset('audio/elevator_ding.mp3'),
+    footstep: publicAsset('audio/footstep_wood.m4a'),
+    lightSwitch: publicAsset('audio/light_switch.m4a'),
   },
   models: {
     bed: new URL('../assets/models/furniture/dormitory_bed_single.obj', import.meta.url).href,
@@ -151,11 +153,87 @@ function loadTexture(url, repeatX, repeatY) {
   return texture;
 }
 
+function makeMushedTexture(name, colors, repeatX = 1, repeatY = 1, size = 64) {
+  const canvasTexture = document.createElement('canvas');
+  canvasTexture.width = size;
+  canvasTexture.height = size;
+  const ctx = canvasTexture.getContext('2d');
+  let seed = 2166136261;
+  for (let i = 0; i < name.length; i += 1) seed = Math.imul(seed ^ name.charCodeAt(i), 16777619);
+  const random = () => {
+    seed ^= seed << 13;
+    seed ^= seed >>> 17;
+    seed ^= seed << 5;
+    return ((seed >>> 0) % 1000) / 1000;
+  };
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const base = colors[Math.floor(random() * colors.length)];
+      const c = new THREE.Color(base);
+      const grain = 0.78 + random() * 0.32;
+      const smear = 0.86 + Math.sin((x + y * 0.35) * 0.28) * 0.08;
+      c.multiplyScalar(grain * smear);
+      ctx.fillStyle = `#${c.getHexString()}`;
+      ctx.fillRect(x, y, 1, 1);
+    }
+  }
+  const texture = new THREE.CanvasTexture(canvasTexture);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(repeatX, repeatY);
+  texture.magFilter = THREE.NearestFilter;
+  texture.minFilter = THREE.NearestMipmapNearestFilter;
+  return texture;
+}
+
+function makeTileTexture(name, baseColor, stainColor, groutColor, repeatX = 3, repeatY = 3, size = 96) {
+  const canvasTexture = document.createElement('canvas');
+  canvasTexture.width = size;
+  canvasTexture.height = size;
+  const ctx = canvasTexture.getContext('2d');
+  let seed = 2166136261;
+  for (let i = 0; i < name.length; i += 1) seed = Math.imul(seed ^ name.charCodeAt(i), 16777619);
+  const random = () => {
+    seed ^= seed << 13;
+    seed ^= seed >>> 17;
+    seed ^= seed << 5;
+    return ((seed >>> 0) % 1000) / 1000;
+  };
+  const tile = 16;
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const onGrout = x % tile < 1 || y % tile < 1;
+      const c = new THREE.Color(onGrout ? groutColor : baseColor);
+      const verticalStain = Math.max(0, Math.sin((x + seed) * 0.15) * 0.08);
+      const dirt = random() * 0.08 + verticalStain;
+      if (!onGrout && random() > 0.88) c.lerp(new THREE.Color(stainColor), 0.28 + dirt);
+      c.multiplyScalar(0.9 + random() * 0.18 - dirt);
+      ctx.fillStyle = `#${c.getHexString()}`;
+      ctx.fillRect(x, y, 1, 1);
+    }
+  }
+  const texture = new THREE.CanvasTexture(canvasTexture);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(repeatX, repeatY);
+  texture.magFilter = THREE.NearestFilter;
+  texture.minFilter = THREE.NearestMipmapNearestFilter;
+  return texture;
+}
+
 const tex = {
   concrete: loadTexture(assets.textures.concrete, 1.6, 1.6),
   floor: loadTexture(assets.textures.floor, 2.2, 2.2),
   metal: loadTexture(assets.textures.metal, 1.2, 1.2),
   wallpaper: loadTexture(assets.textures.wallpaper, 1.8, 1.5),
+  bathroomTile: makeTileTexture('bathroom tile', 0xa9ada3, 0x666d67, 0x555b58, 3.4, 3.2, 96),
+  dirtyCeramic: makeMushedTexture('dirty ceramic', [0xd7d2c0, 0xb8b3a5, 0xe7dfca, 0x8b877c], 1.5, 1.5, 48),
+  fabric: makeMushedTexture('thin old fabric', [0x9b8d78, 0x655f50, 0xb9af9b, 0x3f3b33], 2.5, 2.5, 48),
+  curtain: makeMushedTexture('pink curtain photo smear', [0xa98779, 0xc0a091, 0x745b56, 0xd3b8a6], 1.5, 2.6, 48),
+  deskLaminate: makeMushedTexture('brown laminated desk', [0x6e4a32, 0x9a6d49, 0x3d2a1d, 0xb38a61], 2, 2, 48),
+  roadAsphalt: makeMushedTexture('wet asphalt', [0x080808, 0x171716, 0x282623, 0x0f1113], 2, 2, 48),
 };
 
 const mat = {
@@ -166,15 +244,25 @@ const mat = {
   trim: new THREE.MeshLambertMaterial({ color: 0x24211e }),
   door: new THREE.MeshLambertMaterial({ color: 0x443225 }),
   doorDark: new THREE.MeshLambertMaterial({ color: 0x1d1713 }),
-  wood: new THREE.MeshLambertMaterial({ color: 0x7b5639 }),
+  wood: new THREE.MeshLambertMaterial({ color: 0x7b5639, map: tex.deskLaminate }),
   paleWall: new THREE.MeshLambertMaterial({ color: 0xc4bea9 }),
-  paleCurtain: new THREE.MeshLambertMaterial({ color: 0xa98678 }),
-  mattress: new THREE.MeshLambertMaterial({ color: 0xb5b0a4 }),
+  paleCurtain: new THREE.MeshLambertMaterial({ color: 0xa98678, map: tex.curtain }),
+  mattress: new THREE.MeshLambertMaterial({ color: 0xb5b0a4, map: tex.fabric }),
   darkChair: new THREE.MeshLambertMaterial({ color: 0x111315 }),
   paper: new THREE.MeshLambertMaterial({ color: 0xd1c7aa }),
   plastic: new THREE.MeshLambertMaterial({ color: 0xa2a7a0 }),
+  bedding: new THREE.MeshLambertMaterial({ color: 0x635a47, map: tex.fabric }),
+  pillow: new THREE.MeshLambertMaterial({ color: 0xd0c7b9 }),
+  bathroomTile: new THREE.MeshLambertMaterial({ color: 0xb4b5aa, map: tex.bathroomTile }),
+  dirtyCeramic: new THREE.MeshLambertMaterial({ color: 0xd5cfbd, map: tex.dirtyCeramic }),
+  screenGlow: new THREE.MeshBasicMaterial({ color: 0x0c1b27 }),
+  roadLine: new THREE.MeshBasicMaterial({ color: 0xd5c46c }),
+  tailLight: new THREE.MeshBasicMaterial({ color: 0xb43124 }),
+  streetLamp: new THREE.MeshBasicMaterial({ color: 0xe3c177 }),
   red: new THREE.MeshLambertMaterial({ color: 0x612121 }),
   black: new THREE.MeshLambertMaterial({ color: 0x080808 }),
+  asphalt: new THREE.MeshLambertMaterial({ color: 0x141414, map: tex.roadAsphalt }),
+  invisible: new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0 }),
   metal: new THREE.MeshLambertMaterial({ color: 0xc2c0b8, map: tex.metal }),
   stain: new THREE.MeshBasicMaterial({ color: 0x15110d, transparent: true, opacity: 0.36 }),
   glow: new THREE.MeshBasicMaterial({ color: 0xdad2aa }),
@@ -204,7 +292,7 @@ bedroomLight.position.set(-2.8, 2.35, -4.25);
 scene.add(bedroomLight);
 
 const bathroomLight = new THREE.PointLight(0xb8d6ff, 0.0, 7, 2);
-bathroomLight.position.set(3.0, 2.3, -2.0);
+bathroomLight.position.set(1.42, 2.16, -3.48);
 scene.add(bathroomLight);
 
 const exitColdLight = new THREE.PointLight(0x94b6ff, 0.0, 10, 2);
@@ -291,27 +379,33 @@ function addRoomShell() {
   box('photo back wall', new THREE.Vector3(4.35, 2.65, 0.18), new THREE.Vector3(-2.05, 1.32, -5.65), mat.wall);
   box('photo entry wall', new THREE.Vector3(4.35, 2.65, 0.18), new THREE.Vector3(-2.05, 1.32, 1.55), mat.wall);
   box('photo bed wall', new THREE.Vector3(0.18, 2.65, 7.15), new THREE.Vector3(-4.3, 1.32, -2.05), mat.wall);
-  box('photo desk wall', new THREE.Vector3(0.18, 2.65, 7.15), new THREE.Vector3(0.22, 1.32, -2.05), mat.wall);
+  box('photo desk wall back segment', new THREE.Vector3(0.18, 2.65, 1.35), new THREE.Vector3(0.22, 1.32, -4.98), mat.wall);
+  box('photo desk wall front segment', new THREE.Vector3(0.18, 2.65, 4.15), new THREE.Vector3(0.22, 1.32, -0.42), mat.wall);
+  box('bathroom doorway header', new THREE.Vector3(0.18, 0.45, 1.0), new THREE.Vector3(0.22, 2.42, -3.55), mat.wall);
   box('entry alcove dark wall', new THREE.Vector3(1.35, 2.45, 0.16), new THREE.Vector3(-0.55, 1.22, 1.2), mat.doorDark);
   box('narrow entry trim', new THREE.Vector3(1.24, 0.12, 0.1), new THREE.Vector3(-0.55, 2.08, 1.05), mat.trim, root, false);
-  box('shared bathroom hint wall', new THREE.Vector3(1.4, 2.45, 1.7), new THREE.Vector3(1.0, 1.22, -3.9), mat.wall);
   addGrimeAndSigns();
+  addBathroom();
 }
 
 function addFurniture() {
   box('photo bed mattress', new THREE.Vector3(1.15, 0.32, 2.5), new THREE.Vector3(-3.65, 0.34, -4.25), mat.mattress);
   box('green bed base', new THREE.Vector3(1.28, 0.18, 2.65), new THREE.Vector3(-3.65, 0.16, -4.25), new THREE.MeshLambertMaterial({ color: 0x455241 }));
   box('bed headboard', new THREE.Vector3(1.18, 0.74, 0.12), new THREE.Vector3(-3.65, 0.72, -5.46), mat.doorDark);
+  box('thin blanket folded on bed', new THREE.Vector3(1.06, 0.06, 1.2), new THREE.Vector3(-3.65, 0.54, -3.72), mat.bedding, root, false);
+  box('flat pillow near window', new THREE.Vector3(0.86, 0.12, 0.42), new THREE.Vector3(-3.65, 0.62, -5.08), mat.pillow, root, false);
   box('desk opposite bed', new THREE.Vector3(0.62, 0.18, 1.36), new THREE.Vector3(-0.18, 0.82, -4.32), mat.wood);
   box('desk leg front', new THREE.Vector3(0.1, 0.72, 0.1), new THREE.Vector3(-0.18, 0.4, -3.78), mat.wood);
   box('desk leg back', new THREE.Vector3(0.1, 0.72, 0.1), new THREE.Vector3(-0.18, 0.4, -4.86), mat.wood);
-  game.chair = box('black plastic chair', new THREE.Vector3(0.58, 0.75, 0.58), new THREE.Vector3(-0.92, 0.38, -4.32), mat.darkChair);
+  game.chair = box('black plastic chair collider', new THREE.Vector3(0.6, 0.78, 0.6), new THREE.Vector3(-0.92, 0.38, -4.32), mat.invisible, root, true);
+  game.chairVisual = addProceduralChair(new THREE.Vector3(-0.92, 0, -4.32), -Math.PI / 2 + 0.15);
   box('wardrobe', new THREE.Vector3(0.72, 2.1, 0.62), new THREE.Vector3(-0.18, 1.05, -0.7), mat.doorDark);
   box('mini fridge', new THREE.Vector3(0.72, 0.82, 0.62), new THREE.Vector3(-0.2, 0.42, -1.62), mat.black);
   game.tv = box('blank black monitor', new THREE.Vector3(0.78, 0.44, 0.07), new THREE.Vector3(-0.68, 1.08, -4.75), mat.black, root, false);
   box('shoe rack', new THREE.Vector3(1.1, 0.32, 0.38), new THREE.Vector3(-1.7, 0.18, 0.9), mat.wood);
   game.mirror = planeLike('mirror', new THREE.Vector3(0.7, 0.72, 0.04), new THREE.Vector3(0.11, 1.48, -3.7), mat.mirror);
   addPhotoRoomDetails();
+  addDeskClutter();
 }
 
 function addPhotoRoomDetails() {
@@ -338,9 +432,96 @@ function addPhotoRoomDetails() {
   addWindowExterior();
 }
 
+function addDeskClutter() {
+  box('desk monitor silhouette', new THREE.Vector3(0.08, 0.54, 0.7), new THREE.Vector3(-0.49, 1.15, -4.32), mat.black, root, false);
+  box('desk monitor blue noise', new THREE.Vector3(0.04, 0.42, 0.56), new THREE.Vector3(-0.53, 1.15, -4.32), mat.screenGlow, root, false);
+  box('desk keyboard', new THREE.Vector3(0.34, 0.035, 0.48), new THREE.Vector3(-0.45, 0.93, -4.0), mat.black, root, false);
+  box('desk book stack lower', new THREE.Vector3(0.36, 0.055, 0.28), new THREE.Vector3(-0.48, 0.91, -4.83), mat.paper, root, false);
+  box('desk book stack upper', new THREE.Vector3(0.3, 0.055, 0.24), new THREE.Vector3(-0.48, 0.98, -4.84), mat.red, root, false);
+  box('wall socket near desk', new THREE.Vector3(0.035, 0.18, 0.2), new THREE.Vector3(0.13, 0.44, -3.62), mat.paper, root, false);
+  const cableGeometry = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(0.11, 0.39, -3.62),
+    new THREE.Vector3(-0.16, 0.17, -3.8),
+    new THREE.Vector3(-0.58, 0.1, -4.05),
+  ]);
+  const cable = new THREE.Line(cableGeometry, new THREE.LineBasicMaterial({ color: 0x050505 }));
+  cable.name = 'desk black cable';
+  root.add(cable);
+  const cup = cylinder('desk paper cup', 0.11, 0.09, 0.18, 10, new THREE.Vector3(-0.48, 1.02, -3.72), mat.paper, root, false);
+  cup.rotation.x = 0.08;
+  box('desk phone dark slab', new THREE.Vector3(0.18, 0.025, 0.34), new THREE.Vector3(-0.46, 0.94, -4.56), mat.black, root, false);
+}
+
+function addProceduralChair(position, rotationY) {
+  const chair = new THREE.Group();
+  chair.name = 'procedural black plastic chair';
+  chair.position.copy(position);
+  chair.rotation.y = rotationY;
+  root.add(chair);
+  box('chair seat shell', new THREE.Vector3(0.58, 0.12, 0.56), new THREE.Vector3(0, 0.5, 0), mat.darkChair, chair, false);
+  box('chair curved back panel', new THREE.Vector3(0.58, 0.76, 0.1), new THREE.Vector3(0, 0.9, -0.24), mat.darkChair, chair, false);
+  box('chair back cutout', new THREE.Vector3(0.3, 0.16, 0.105), new THREE.Vector3(0, 1.02, -0.3), mat.black, chair, false);
+  for (const [x, z] of [
+    [-0.22, -0.18],
+    [0.22, -0.18],
+    [-0.22, 0.2],
+    [0.22, 0.2],
+  ]) {
+    box('thin chrome chair leg', new THREE.Vector3(0.055, 0.52, 0.055), new THREE.Vector3(x, 0.25, z), mat.metal, chair, false);
+  }
+  return chair;
+}
+
+function addBathroom() {
+  box('bathroom wet floor', new THREE.Vector3(2.35, 0.1, 2.18), new THREE.Vector3(1.48, -0.05, -3.56), mat.bathroomTile);
+  box('bathroom low ceiling', new THREE.Vector3(2.35, 0.1, 2.18), new THREE.Vector3(1.48, 2.42, -3.56), mat.ceiling);
+  box('bathroom right tile wall', new THREE.Vector3(0.12, 2.5, 2.18), new THREE.Vector3(2.68, 1.25, -3.56), mat.bathroomTile);
+  box('bathroom back tile wall', new THREE.Vector3(2.35, 2.5, 0.12), new THREE.Vector3(1.48, 1.25, -4.68), mat.bathroomTile);
+  box('bathroom front tile wall', new THREE.Vector3(2.35, 2.5, 0.12), new THREE.Vector3(1.48, 1.25, -2.44), mat.bathroomTile);
+  box('bathroom door frame top', new THREE.Vector3(0.16, 0.22, 1.04), new THREE.Vector3(0.28, 2.2, -3.55), mat.trim, root, false);
+  box('bathroom threshold dirty sill', new THREE.Vector3(0.24, 0.08, 0.92), new THREE.Vector3(0.36, 0.04, -3.55), mat.metal, root, false);
+  box('bathroom fluorescent cover', new THREE.Vector3(0.72, 0.045, 0.22), new THREE.Vector3(1.42, 2.31, -3.48), mat.glow, root, false);
+  for (const z of [-4.34, -3.86, -3.38, -2.9]) {
+    box('bathroom floor grout horizontal', new THREE.Vector3(2.08, 0.012, 0.018), new THREE.Vector3(1.48, 0.012, z), mat.stain, root, false);
+  }
+  for (const x of [0.78, 1.26, 1.74, 2.22]) {
+    box('bathroom floor grout vertical', new THREE.Vector3(0.018, 0.012, 1.72), new THREE.Vector3(x, 0.014, -3.56), mat.stain, root, false);
+  }
+
+  const toiletBase = cylinder('bathroom toilet base', 0.26, 0.32, 0.38, 12, new THREE.Vector3(2.0, 0.25, -4.08), mat.dirtyCeramic, root, true);
+  toiletBase.scale.z = 0.82;
+  const toiletSeat = cylinder('bathroom toilet seat', 0.36, 0.34, 0.12, 16, new THREE.Vector3(2.0, 0.5, -4.08), mat.dirtyCeramic, root, true);
+  toiletSeat.scale.z = 0.72;
+  box('bathroom toilet tank', new THREE.Vector3(0.7, 0.44, 0.22), new THREE.Vector3(2.0, 0.75, -4.55), mat.dirtyCeramic);
+
+  box('bathroom sink bowl block', new THREE.Vector3(0.72, 0.22, 0.42), new THREE.Vector3(0.86, 0.86, -4.38), mat.dirtyCeramic, root, true);
+  box('bathroom sink cabinet shadow', new THREE.Vector3(0.52, 0.58, 0.32), new THREE.Vector3(0.86, 0.45, -4.38), mat.plastic, root, true);
+  box('bathroom faucet', new THREE.Vector3(0.08, 0.16, 0.08), new THREE.Vector3(0.86, 1.02, -4.56), mat.metal, root, false);
+  box('bathroom mirror smeared', new THREE.Vector3(0.62, 0.64, 0.035), new THREE.Vector3(0.86, 1.48, -4.61), mat.mirror, root, false);
+  box('bathroom mirror water streak one', new THREE.Vector3(0.025, 0.5, 0.02), new THREE.Vector3(0.72, 1.44, -4.58), mat.stain, root, false);
+  box('bathroom mirror water streak two', new THREE.Vector3(0.02, 0.38, 0.02), new THREE.Vector3(0.98, 1.52, -4.58), mat.stain, root, false);
+
+  const showerLine = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(2.52, 1.9, -3.2),
+    new THREE.Vector3(2.3, 1.58, -3.25),
+    new THREE.Vector3(2.42, 1.18, -3.34),
+  ]);
+  const showerHose = new THREE.Line(showerLine, new THREE.LineBasicMaterial({ color: 0x2d3030 }));
+  showerHose.name = 'bathroom shower hose';
+  root.add(showerHose);
+  box('bathroom shower head', new THREE.Vector3(0.18, 0.08, 0.12), new THREE.Vector3(2.46, 1.86, -3.18), mat.metal, root, false);
+  box('bathroom drain grate', new THREE.Vector3(0.34, 0.025, 0.28), new THREE.Vector3(1.45, 0.02, -3.05), mat.metal, root, false);
+  box('bathroom wet stain floor', new THREE.Vector3(1.1, 0.025, 0.72), new THREE.Vector3(1.42, 0.025, -3.24), mat.stain, root, false);
+  box('bathroom towel rail', new THREE.Vector3(0.08, 0.08, 0.76), new THREE.Vector3(2.6, 1.42, -2.98), mat.metal, root, false);
+  box('bathroom hanging towel smear', new THREE.Vector3(0.06, 0.64, 0.5), new THREE.Vector3(2.56, 1.05, -2.98), mat.paleCurtain, root, false);
+}
+
 function addWindowViewLayer() {
   box('window open road strip', new THREE.Vector3(0.44, 0.28, 0.02), new THREE.Vector3(-1.58, 1.02, -5.4), mat.black, root, false);
-  box('window road center line', new THREE.Vector3(0.06, 0.02, 0.018), new THREE.Vector3(-1.58, 1.02, -5.37), mat.glow, root, false);
+  box('window road center line', new THREE.Vector3(0.06, 0.02, 0.018), new THREE.Vector3(-1.58, 1.02, -5.37), mat.roadLine, root, false);
+  box('window passing car red one', new THREE.Vector3(0.08, 0.035, 0.018), new THREE.Vector3(-1.72, 0.92, -5.35), mat.tailLight, root, false);
+  box('window passing car red two', new THREE.Vector3(0.08, 0.035, 0.018), new THREE.Vector3(-1.48, 0.93, -5.35), mat.tailLight, root, false);
+  box('window street lamp smear', new THREE.Vector3(0.07, 0.22, 0.018), new THREE.Vector3(-1.35, 1.22, -5.35), mat.streetLamp, root, false);
   box('window opposite building slice', new THREE.Vector3(0.44, 0.7, 0.02), new THREE.Vector3(-1.58, 1.63, -5.39), mat.concrete, root, false);
   for (const [x, y] of [
     [-1.68, 1.78],
@@ -358,9 +539,11 @@ function addWindowExterior() {
   const outside = new THREE.Group();
   outside.name = 'window exterior facade';
   root.add(outside);
-  box('outside second floor road', new THREE.Vector3(4.6, 0.08, 3.2), new THREE.Vector3(-1.58, -0.08, -7.35), mat.black, outside, false);
-  box('outside road lane mark left', new THREE.Vector3(0.08, 0.025, 1.2), new THREE.Vector3(-2.4, -0.02, -7.25), mat.glow, outside, false);
-  box('outside road lane mark right', new THREE.Vector3(0.08, 0.025, 1.2), new THREE.Vector3(-0.6, -0.02, -7.25), mat.glow, outside, false);
+  box('outside second floor road', new THREE.Vector3(4.6, 0.08, 3.2), new THREE.Vector3(-1.58, -0.08, -7.35), mat.asphalt, outside, false);
+  box('outside road lane mark left', new THREE.Vector3(0.08, 0.025, 1.2), new THREE.Vector3(-2.4, -0.02, -7.25), mat.roadLine, outside, false);
+  box('outside road lane mark right', new THREE.Vector3(0.08, 0.025, 1.2), new THREE.Vector3(-0.6, -0.02, -7.25), mat.roadLine, outside, false);
+  box('outside street lamp pole', new THREE.Vector3(0.05, 1.6, 0.05), new THREE.Vector3(0.66, 0.73, -6.85), mat.metal, outside, false);
+  box('outside sodium street lamp', new THREE.Vector3(0.28, 0.12, 0.08), new THREE.Vector3(0.52, 1.45, -6.72), mat.streetLamp, outside, false);
   box('outside opposite building wall', new THREE.Vector3(4.2, 2.8, 0.12), new THREE.Vector3(-1.55, 1.45, -8.55), mat.concrete, outside, false);
   for (const [x, y] of [
     [-2.7, 1.9],
@@ -383,27 +566,11 @@ function addGrimeAndSigns() {
   box('entry shoe mark b', new THREE.Vector3(0.34, 0.025, 0.16), new THREE.Vector3(-0.75, 0.04, 0.6), mat.stain, root, false);
   box('room warning sticker', new THREE.Vector3(0.32, 0.16, 0.03), new THREE.Vector3(-0.55, 1.55, 1.08), mat.paper, root, false);
   box('room sticker slash', new THREE.Vector3(0.24, 0.025, 0.035), new THREE.Vector3(-0.55, 1.55, 1.03), mat.red, root, false);
+  box('peeling wallpaper bed wall one', new THREE.Vector3(0.04, 0.38, 0.28), new THREE.Vector3(-4.2, 1.52, -3.7), mat.stain, root, false);
+  box('peeling wallpaper bed wall two', new THREE.Vector3(0.04, 0.24, 0.18), new THREE.Vector3(-4.2, 1.16, -2.2), mat.stain, root, false);
 }
 
 function addLoadedModels() {
-  loadObj('asset bed single', assets.models.bed, {
-    position: new THREE.Vector3(-3.65, 0.42, -4.25),
-    rotation: new THREE.Euler(0, Math.PI / 2, 0),
-    scale: 1.05,
-    material: mat.mattress,
-  });
-  loadObj('asset desk drawer', assets.models.desk, {
-    position: new THREE.Vector3(-0.18, 0.88, -4.32),
-    rotation: new THREE.Euler(0, Math.PI / 2, 0),
-    scale: 1.0,
-    material: mat.wood,
-  });
-  game.chairModel = loadObj('asset plastic chair', assets.models.chair, {
-    position: new THREE.Vector3(-0.92, 0.78, -4.32),
-    rotation: new THREE.Euler(0, -Math.PI / 2 + 0.15, 0),
-    scale: 1.05,
-    material: mat.darkChair,
-  });
   loadObj('asset elevator door set', assets.models.elevatorDoor, {
     position: new THREE.Vector3(1.46, 1.12, 7.55),
     rotation: new THREE.Euler(0, Math.PI / 2, 0),
@@ -437,7 +604,6 @@ function addClutterModels() {
     ['cardboard stack 2', assets.models.cardboardBoxes, [1.08, 0.32, 10.95], [0, 0.5, 0], 1.0, mat.wood],
     ['cardboard stack 3', assets.models.cardboardBoxes, [-1.15, 0.32, 13.6], [0, 0.1, 0], 1.0, mat.wood],
     ['power strip room 204', assets.models.powerStrip, [-1.08, 0.08, 6.5], [0, -0.05, 0], 1.05, mat.plastic],
-    ['cup ramen desk', assets.models.cupRamen, [-1.08, 1.0, -4.42], [0, 0.2, 0], 1.0, mat.paper],
     ['hanging towel bath', assets.models.towel, [0.28, 1.28, -3.55], [0, -Math.PI / 2, 0], 1.15, mat.paleCurtain],
     ['common cup ramen 1', assets.models.cupRamen, [0.8, 1.02, 24.55], [0, -0.1, 0], 0.9, mat.paper],
     ['common cup ramen 2', assets.models.cupRamen, [1.15, 1.02, 24.65], [0, 0.35, 0], 0.9, mat.paper],
@@ -526,6 +692,10 @@ function addCorridorDetails() {
   box('elevator floor sign plate', new THREE.Vector3(0.48, 0.18, 0.04), new THREE.Vector3(1.38, 1.78, 7.0), mat.paper, root, false);
   box('elevator red arrow', new THREE.Vector3(0.18, 0.04, 0.045), new THREE.Vector3(1.36, 1.78, 7.0), mat.red, root, false);
   box('corridor cable tray', new THREE.Vector3(0.08, 0.08, 8.5), new THREE.Vector3(-1.42, 2.08, 10.8), mat.metal, root, false);
+  box('corridor end narrow window frame', new THREE.Vector3(1.05, 0.82, 0.04), new THREE.Vector3(0, 1.58, 15.77), mat.trim, root, false);
+  box('corridor end night window', new THREE.Vector3(0.82, 0.58, 0.035), new THREE.Vector3(0, 1.58, 15.72), mat.windowGlass, root, false);
+  box('corridor end outside road glow', new THREE.Vector3(0.7, 0.08, 0.03), new THREE.Vector3(0, 1.36, 15.69), mat.streetLamp, root, false);
+  box('emergency exit sign', new THREE.Vector3(0.58, 0.18, 0.04), new THREE.Vector3(-0.94, 2.02, 7.45), new THREE.MeshBasicMaterial({ color: 0x245f42 }), root, false);
   addFlatFlyers();
 }
 
@@ -556,6 +726,9 @@ function addCommonSpaceDetails() {
   box('common sink block', new THREE.Vector3(0.8, 0.78, 0.54), new THREE.Vector3(1.75, 0.39, 24.3), mat.metal);
   box('common trash bin', new THREE.Vector3(0.42, 0.68, 0.42), new THREE.Vector3(-1.85, 0.34, 22.0), mat.black);
   box('common fluorescent cover', new THREE.Vector3(1.1, 0.045, 0.28), new THREE.Vector3(0, 2.32, 22.5), mat.glow, root, false);
+  box('common rice scoop handle', new THREE.Vector3(0.08, 0.06, 0.5), new THREE.Vector3(0.72, 1.04, 24.1), mat.plastic, root, false);
+  box('common taped label one', new THREE.Vector3(0.32, 0.12, 0.04), new THREE.Vector3(-0.8, 1.32, 24.1), mat.paper, root, false);
+  box('common taped label two', new THREE.Vector3(0.32, 0.12, 0.04), new THREE.Vector3(0.24, 1.32, 24.1), mat.paper, root, false);
 }
 
 function addDoorsAndItems() {
@@ -731,9 +904,9 @@ function triggerChairEvent() {
   game.eventFlags.add('chair-moved');
   game.chair.position.set(-1.05, 0.38, -2.55);
   game.chair.rotation.y = -0.55;
-  if (game.chairModel) {
-    game.chairModel.position.set(-1.05, 0.78, -2.55);
-    game.chairModel.rotation.y = -0.55;
+  if (game.chairVisual) {
+    game.chairVisual.position.set(-1.05, 0, -2.55);
+    game.chairVisual.rotation.y = -0.55;
   }
   triggerFluorescentFlicker();
   playSound('doorClose', 0.3);
@@ -832,6 +1005,19 @@ function startGame() {
 }
 
 function applyDebugStartHash() {
+  if (location.hash === '#bathroom') {
+    storyPreviewEl.classList.add('hidden');
+    game.introActive = false;
+    game.bathroomDoorOpen = true;
+    openDoor(game.bathroomDoor, true);
+    game.bathroomLight = true;
+    bathroomLight.intensity = 1.25;
+    camera.position.set(1.12, 1.54, -2.76);
+    camera.rotation.set(0, -0.28, 0);
+    game.yawTarget = -0.28;
+    game.pitchTarget = 0;
+    setObjective('화장실을 확인하자.');
+  }
   if (location.hash === '#corridor') {
     storyPreviewEl.classList.add('hidden');
     game.introActive = false;

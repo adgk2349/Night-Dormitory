@@ -4,6 +4,12 @@ Browser-playable first-person psychological horror prototype for a game hackatho
 
 ## Play
 
+Hosted build:
+
+https://adgk2349.github.io/Night-Dormitory/
+
+Local development:
+
 ```bash
 npm install
 npm run dev
@@ -23,8 +29,9 @@ Open `http://localhost:5173`.
 - Single-room apartment horror loop
 - Goshiwon corridor with the room placed next to an elevator
 - First-floor shared rice-cooker area
-- Room details based on the provided reference photos: curtain, wall AC, narrow bed, desk/drawer, black chair, fan, and wood floor tone
-- Rebuilt first room layout around the reference photo: narrow rectangular goshiwon room, left-side bed, back window/curtains, right-side desk, entry-side clutter, and visible exterior facade through the window
+- Room details based on the provided reference photos: curtain, wall AC, narrow bed, desk/drawer, black chair, fan, vertical window, and wood floor tone
+- Rebuilt first room layout around the reference photo: narrow rectangular goshiwon room, left-side bed, desk opposite the bed, vertical window/curtains, entry-side clutter, and visible second-floor road/exterior facade through the window
+- Enterable compact bathroom with smeared tile texture, sink, mirror, toilet, drain, towel, and shower hose
 - Low-poly, low-resource WebGL visuals
 - Door and light interactions
 - RoomState-driven spatial changes
@@ -38,6 +45,7 @@ Open `http://localhost:5173`.
 - Irregular fluorescent micro-flicker logic and distant elevator sound cues
 - Retro camera tuning: narrower FOV, slower mouse smoothing, heavier head bob, scanlines, noise, and vignette
 - PSX-style derived textures in `assets/textures/psx/`, generated from the source photo/PBR textures at very low resolution and high compression
+- Runtime generated low-resolution mush textures for fabric, tile, dirty ceramic, asphalt, and desk laminate surfaces
 - Horror beats: chair reposition after the first memory fragment, slippers shifting toward the elevator in the corridor, and a darker rice-cooker ending pulse
 
 ## Build
@@ -56,6 +64,7 @@ These hash routes are for development checks and demo capture only:
 
 - `http://localhost:5173/#corridor`
 - `http://localhost:5173/#common`
+- `http://localhost:5173/#bathroom`
 
 ## Asset Policy
 
