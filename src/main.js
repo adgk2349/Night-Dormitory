@@ -112,8 +112,16 @@ scene.background = new THREE.Color(0x050506);
 scene.fog = new THREE.Fog(0x060607, 5.5, 30);
 
 const camera = new THREE.PerspectiveCamera(63, window.innerWidth / window.innerHeight, 0.05, 70);
-camera.position.set(-2.05, 1.62, 0.72);
+camera.position.set(-2.78, 1.62, 0.18);
 camera.rotation.order = 'YXZ';
+window.__nightDormitoryDebug = {
+  getPosition: () => ({
+    x: Number(camera.position.x.toFixed(3)),
+    y: Number(camera.position.y.toFixed(3)),
+    z: Number(camera.position.z.toFixed(3)),
+  }),
+  getArea: () => game.area,
+};
 
 const renderer = new THREE.WebGLRenderer({
   canvas,
@@ -294,10 +302,10 @@ function addFurniture() {
   box('photo bed mattress', new THREE.Vector3(1.15, 0.32, 2.5), new THREE.Vector3(-3.65, 0.34, -4.25), mat.mattress);
   box('green bed base', new THREE.Vector3(1.28, 0.18, 2.65), new THREE.Vector3(-3.65, 0.16, -4.25), new THREE.MeshLambertMaterial({ color: 0x455241 }));
   box('bed headboard', new THREE.Vector3(1.18, 0.74, 0.12), new THREE.Vector3(-3.65, 0.72, -5.46), mat.doorDark);
-  box('desk', new THREE.Vector3(1.34, 0.18, 0.62), new THREE.Vector3(-0.62, 0.82, -4.4), mat.wood);
-  box('desk leg a', new THREE.Vector3(0.1, 0.72, 0.1), new THREE.Vector3(-1.18, 0.4, -4.63), mat.wood);
-  box('desk leg b', new THREE.Vector3(0.1, 0.72, 0.1), new THREE.Vector3(-0.1, 0.4, -4.63), mat.wood);
-  game.chair = box('black plastic chair', new THREE.Vector3(0.58, 0.75, 0.58), new THREE.Vector3(-0.7, 0.38, -3.55), mat.darkChair);
+  box('desk opposite bed', new THREE.Vector3(0.62, 0.18, 1.36), new THREE.Vector3(-0.18, 0.82, -4.32), mat.wood);
+  box('desk leg front', new THREE.Vector3(0.1, 0.72, 0.1), new THREE.Vector3(-0.18, 0.4, -3.78), mat.wood);
+  box('desk leg back', new THREE.Vector3(0.1, 0.72, 0.1), new THREE.Vector3(-0.18, 0.4, -4.86), mat.wood);
+  game.chair = box('black plastic chair', new THREE.Vector3(0.58, 0.75, 0.58), new THREE.Vector3(-0.92, 0.38, -4.32), mat.darkChair);
   box('wardrobe', new THREE.Vector3(0.72, 2.1, 0.62), new THREE.Vector3(-0.18, 1.05, -0.7), mat.doorDark);
   box('mini fridge', new THREE.Vector3(0.72, 0.82, 0.62), new THREE.Vector3(-0.2, 0.42, -1.62), mat.black);
   game.tv = box('blank black monitor', new THREE.Vector3(0.78, 0.44, 0.07), new THREE.Vector3(-0.68, 1.08, -4.75), mat.black, root, false);
@@ -307,8 +315,8 @@ function addFurniture() {
 }
 
 function addPhotoRoomDetails() {
-  box('back window frame', new THREE.Vector3(1.05, 0.92, 0.08), new THREE.Vector3(-1.55, 1.7, -5.52), mat.trim, root, false);
-  box('dark window glass', new THREE.Vector3(0.86, 0.7, 0.04), new THREE.Vector3(-1.55, 1.7, -5.46), mat.windowGlass, root, false);
+  box('tall window frame', new THREE.Vector3(0.66, 1.46, 0.08), new THREE.Vector3(-1.58, 1.56, -5.52), mat.trim, root, false);
+  box('tall dark window glass', new THREE.Vector3(0.46, 1.22, 0.04), new THREE.Vector3(-1.58, 1.56, -5.46), mat.windowGlass, root, false);
   addWindowViewLayer();
   box('left curtain panel', new THREE.Vector3(0.34, 1.34, 0.07), new THREE.Vector3(-2.18, 1.38, -5.4), mat.paleCurtain, root, false);
   box('right curtain panel', new THREE.Vector3(0.34, 1.34, 0.07), new THREE.Vector3(-0.92, 1.38, -5.4), mat.paleCurtain, root, false);
@@ -316,8 +324,8 @@ function addPhotoRoomDetails() {
   for (let i = 0; i < 3; i += 1) {
     box(`drawer line ${i}`, new THREE.Vector3(0.42, 0.035, 0.04), new THREE.Vector3(-0.1, 0.24 + i * 0.22, -3.95), mat.metal, root, false);
   }
-  box('wall ac unit', new THREE.Vector3(1.05, 0.32, 0.3), new THREE.Vector3(-3.68, 2.24, -5.34), mat.plastic, root, false);
-  box('ac vent shadow', new THREE.Vector3(0.84, 0.04, 0.04), new THREE.Vector3(-3.68, 2.11, -5.13), mat.black, root, false);
+  box('wall ac unit', new THREE.Vector3(1.05, 0.32, 0.3), new THREE.Vector3(-3.72, 2.24, -5.34), mat.plastic, root, false);
+  box('ac vent shadow', new THREE.Vector3(0.84, 0.04, 0.04), new THREE.Vector3(-3.72, 2.11, -5.13), mat.black, root, false);
 
   const fanBase = cylinder('fan base', 0.28, 0.35, 0.08, 16, new THREE.Vector3(-0.35, 0.08, -1.95), mat.plastic, root, false);
   fanBase.rotation.x = Math.PI / 2;
@@ -331,24 +339,29 @@ function addPhotoRoomDetails() {
 }
 
 function addWindowViewLayer() {
-  box('window visible exterior wall', new THREE.Vector3(0.72, 0.56, 0.02), new THREE.Vector3(-1.55, 1.7, -5.42), mat.concrete, root, false);
+  box('window open road strip', new THREE.Vector3(0.44, 0.28, 0.02), new THREE.Vector3(-1.58, 1.02, -5.4), mat.black, root, false);
+  box('window road center line', new THREE.Vector3(0.06, 0.02, 0.018), new THREE.Vector3(-1.58, 1.02, -5.37), mat.glow, root, false);
+  box('window opposite building slice', new THREE.Vector3(0.44, 0.7, 0.02), new THREE.Vector3(-1.58, 1.63, -5.39), mat.concrete, root, false);
   for (const [x, y] of [
-    [-1.76, 1.82],
-    [-1.47, 1.82],
-    [-1.7, 1.57],
-    [-1.36, 1.58],
+    [-1.68, 1.78],
+    [-1.48, 1.78],
+    [-1.68, 1.5],
+    [-1.48, 1.5],
   ]) {
-    box('window outside tiny room', new THREE.Vector3(0.16, 0.11, 0.018), new THREE.Vector3(x, y, -5.39), mat.windowGlass, root, false);
-    box('window outside ac silhouette', new THREE.Vector3(0.18, 0.06, 0.018), new THREE.Vector3(x + 0.12, y - 0.1, -5.37), mat.metal, root, false);
+    box('window opposite room light', new THREE.Vector3(0.1, 0.1, 0.018), new THREE.Vector3(x, y, -5.36), mat.windowGlass, root, false);
   }
-  box('window outside pipe silhouette', new THREE.Vector3(0.035, 0.55, 0.018), new THREE.Vector3(-1.18, 1.68, -5.36), mat.metal, root, false);
+  box('window railing vertical left', new THREE.Vector3(0.025, 1.18, 0.018), new THREE.Vector3(-1.75, 1.55, -5.34), mat.metal, root, false);
+  box('window railing vertical right', new THREE.Vector3(0.025, 1.18, 0.018), new THREE.Vector3(-1.41, 1.55, -5.34), mat.metal, root, false);
 }
 
 function addWindowExterior() {
   const outside = new THREE.Group();
   outside.name = 'window exterior facade';
   root.add(outside);
-  box('outside gray building wall', new THREE.Vector3(4.2, 2.8, 0.12), new THREE.Vector3(-1.55, 1.45, -7.0), mat.concrete, outside, false);
+  box('outside second floor road', new THREE.Vector3(4.6, 0.08, 3.2), new THREE.Vector3(-1.58, -0.08, -7.35), mat.black, outside, false);
+  box('outside road lane mark left', new THREE.Vector3(0.08, 0.025, 1.2), new THREE.Vector3(-2.4, -0.02, -7.25), mat.glow, outside, false);
+  box('outside road lane mark right', new THREE.Vector3(0.08, 0.025, 1.2), new THREE.Vector3(-0.6, -0.02, -7.25), mat.glow, outside, false);
+  box('outside opposite building wall', new THREE.Vector3(4.2, 2.8, 0.12), new THREE.Vector3(-1.55, 1.45, -8.55), mat.concrete, outside, false);
   for (const [x, y] of [
     [-2.7, 1.9],
     [-1.55, 1.9],
@@ -356,11 +369,11 @@ function addWindowExterior() {
     [-2.1, 1.08],
     [-0.95, 1.08],
   ]) {
-    box('outside small window frame', new THREE.Vector3(0.5, 0.38, 0.05), new THREE.Vector3(x, y, -6.9), mat.trim, outside, false);
-    box('outside blue glass', new THREE.Vector3(0.38, 0.26, 0.04), new THREE.Vector3(x, y, -6.86), mat.mirror, outside, false);
-    box('outside ac unit', new THREE.Vector3(0.46, 0.22, 0.22), new THREE.Vector3(x + 0.42, y - 0.34, -6.82), mat.metal, outside, false);
+    box('outside small window frame', new THREE.Vector3(0.5, 0.38, 0.05), new THREE.Vector3(x, y, -8.45), mat.trim, outside, false);
+    box('outside blue glass', new THREE.Vector3(0.38, 0.26, 0.04), new THREE.Vector3(x, y, -8.41), mat.mirror, outside, false);
+    box('outside ac unit', new THREE.Vector3(0.46, 0.22, 0.22), new THREE.Vector3(x + 0.42, y - 0.34, -8.37), mat.metal, outside, false);
   }
-  box('outside vertical pipe', new THREE.Vector3(0.06, 2.7, 0.08), new THREE.Vector3(0.18, 1.35, -6.78), mat.metal, outside, false);
+  box('outside vertical pipe', new THREE.Vector3(0.06, 2.7, 0.08), new THREE.Vector3(0.18, 1.35, -8.33), mat.metal, outside, false);
 }
 
 function addGrimeAndSigns() {
@@ -380,13 +393,14 @@ function addLoadedModels() {
     material: mat.mattress,
   });
   loadObj('asset desk drawer', assets.models.desk, {
-    position: new THREE.Vector3(-0.62, 0.88, -4.4),
+    position: new THREE.Vector3(-0.18, 0.88, -4.32),
+    rotation: new THREE.Euler(0, Math.PI / 2, 0),
     scale: 1.0,
     material: mat.wood,
   });
   game.chairModel = loadObj('asset plastic chair', assets.models.chair, {
-    position: new THREE.Vector3(-0.7, 0.78, -3.55),
-    rotation: new THREE.Euler(0, Math.PI + 0.15, 0),
+    position: new THREE.Vector3(-0.92, 0.78, -4.32),
+    rotation: new THREE.Euler(0, -Math.PI / 2 + 0.15, 0),
     scale: 1.05,
     material: mat.darkChair,
   });
@@ -965,7 +979,7 @@ function interact() {
 function canMoveTo(position) {
   const radius = 0.23;
   const playerBox = new THREE.Box3(
-    new THREE.Vector3(position.x - radius, 0.08, position.z - radius),
+    new THREE.Vector3(position.x - radius, 0.45, position.z - radius),
     new THREE.Vector3(position.x + radius, 1.78, position.z + radius),
   );
   for (const mesh of game.colliders) {
