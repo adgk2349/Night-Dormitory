@@ -8,6 +8,10 @@ Hosted build:
 
 https://adgk2349.github.io/Night-Dormitory/
 
+Demo video:
+
+https://adgk2349.github.io/Night-Dormitory/demo/night-dormitory-demo.webm
+
 Local development:
 
 ```bash
@@ -74,6 +78,7 @@ These hash routes are for development checks and demo capture only:
 - `http://localhost:5173/#corridor`
 - `http://localhost:5173/#common`
 - `http://localhost:5173/#bathroom`
+- `http://localhost:5173/#showcase`
 
 ## Asset Policy
 
