@@ -45,7 +45,8 @@ Open `http://localhost:5173`.
 - Irregular fluorescent micro-flicker logic and distant elevator sound cues
 - Retro camera tuning: narrower FOV, slower mouse smoothing, heavier head bob, scanlines, noise, and vignette
 - PSX-style derived textures in `assets/textures/psx/`, generated from the source photo/PBR textures at very low resolution and high compression
-- Runtime generated low-resolution mush textures for fabric, tile, dirty ceramic, asphalt, and desk laminate surfaces
+- Photo-derived low-resolution PSX textures in `assets/textures/photo_psx/` for the room wall, curtains, desk laminate, window, exterior wall, entrance glass, and asphalt
+- Runtime generated low-resolution mush textures for fabric and bathroom tile surfaces
 - Horror beats: chair reposition after the first memory fragment, slippers shifting toward the elevator in the corridor, and a darker rice-cooker ending pulse
 
 ## Build
@@ -57,6 +58,14 @@ npm run build
 The production build is generated in `dist/`.
 
 Runtime audio used by the browser build is stored in `public/audio/`.
+
+## Texture Generation
+
+```bash
+npm run generate:textures
+```
+
+This extracts compressed, posterized PSX-style textures from the provided reference photos.
 
 ## Debug Views
 

@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0"
+    "preview": "vite preview --host 0.0.0.0",
+    "generate:textures": "node scripts/generate_photo_psx_textures.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-basic-ssl": "^2.1.0",

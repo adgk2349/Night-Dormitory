@@ -72,6 +72,14 @@ const assets = {
     floor: new URL('../assets/textures/psx/floor_psx.jpg', import.meta.url).href,
     metal: new URL('../assets/textures/psx/metal_psx.jpg', import.meta.url).href,
     wallpaper: new URL('../assets/textures/psx/wallpaper_psx.jpg', import.meta.url).href,
+    photoRoomWall: new URL('../assets/textures/photo_psx/room_wall_photo_psx.jpg', import.meta.url).href,
+    photoCurtain: new URL('../assets/textures/photo_psx/curtain_photo_psx.jpg', import.meta.url).href,
+    photoWindow: new URL('../assets/textures/photo_psx/window_room_photo_psx.jpg', import.meta.url).href,
+    photoDesk: new URL('../assets/textures/photo_psx/desk_laminate_photo_psx.jpg', import.meta.url).href,
+    photoExterior: new URL('../assets/textures/photo_psx/exterior_wall_photo_psx.jpg', import.meta.url).href,
+    photoBuildingWindows: new URL('../assets/textures/photo_psx/building_windows_photo_psx.jpg', import.meta.url).href,
+    photoEntranceGlass: new URL('../assets/textures/photo_psx/entrance_glass_photo_psx.jpg', import.meta.url).href,
+    photoAsphalt: new URL('../assets/textures/photo_psx/asphalt_photo_psx.jpg', import.meta.url).href,
   },
 };
 
@@ -228,6 +236,14 @@ const tex = {
   floor: loadTexture(assets.textures.floor, 2.2, 2.2),
   metal: loadTexture(assets.textures.metal, 1.2, 1.2),
   wallpaper: loadTexture(assets.textures.wallpaper, 1.8, 1.5),
+  photoRoomWall: loadTexture(assets.textures.photoRoomWall, 2.2, 1.8),
+  photoCurtain: loadTexture(assets.textures.photoCurtain, 1.2, 1.4),
+  photoWindow: loadTexture(assets.textures.photoWindow, 1, 1),
+  photoDesk: loadTexture(assets.textures.photoDesk, 1.4, 1.2),
+  photoExterior: loadTexture(assets.textures.photoExterior, 1.5, 1.1),
+  photoBuildingWindows: loadTexture(assets.textures.photoBuildingWindows, 1.2, 1.2),
+  photoEntranceGlass: loadTexture(assets.textures.photoEntranceGlass, 1, 1),
+  photoAsphalt: loadTexture(assets.textures.photoAsphalt, 2.2, 1.4),
   bathroomTile: makeTileTexture('bathroom tile', 0xa9ada3, 0x666d67, 0x555b58, 3.4, 3.2, 96),
   dirtyCeramic: makeMushedTexture('dirty ceramic', [0xd7d2c0, 0xb8b3a5, 0xe7dfca, 0x8b877c], 1.5, 1.5, 48),
   fabric: makeMushedTexture('thin old fabric', [0x9b8d78, 0x655f50, 0xb9af9b, 0x3f3b33], 2.5, 2.5, 48),
@@ -237,16 +253,16 @@ const tex = {
 };
 
 const mat = {
-  wall: new THREE.MeshLambertMaterial({ color: 0xd3c9aa, map: tex.wallpaper }),
+  wall: new THREE.MeshLambertMaterial({ color: 0xcfc3a3, map: tex.photoRoomWall }),
   concrete: new THREE.MeshLambertMaterial({ color: 0xc0bcb0, map: tex.concrete }),
   floor: new THREE.MeshLambertMaterial({ color: 0xaa7850, map: tex.floor }),
   ceiling: new THREE.MeshLambertMaterial({ color: 0x6d6a60 }),
   trim: new THREE.MeshLambertMaterial({ color: 0x24211e }),
   door: new THREE.MeshLambertMaterial({ color: 0x443225 }),
   doorDark: new THREE.MeshLambertMaterial({ color: 0x1d1713 }),
-  wood: new THREE.MeshLambertMaterial({ color: 0x7b5639, map: tex.deskLaminate }),
+  wood: new THREE.MeshLambertMaterial({ color: 0x8a6a50, map: tex.photoDesk }),
   paleWall: new THREE.MeshLambertMaterial({ color: 0xc4bea9 }),
-  paleCurtain: new THREE.MeshLambertMaterial({ color: 0xa98678, map: tex.curtain }),
+  paleCurtain: new THREE.MeshLambertMaterial({ color: 0xb9998c, map: tex.photoCurtain }),
   mattress: new THREE.MeshLambertMaterial({ color: 0xb5b0a4, map: tex.fabric }),
   darkChair: new THREE.MeshLambertMaterial({ color: 0x111315 }),
   paper: new THREE.MeshLambertMaterial({ color: 0xd1c7aa }),
@@ -254,20 +270,23 @@ const mat = {
   bedding: new THREE.MeshLambertMaterial({ color: 0x635a47, map: tex.fabric }),
   pillow: new THREE.MeshLambertMaterial({ color: 0xd0c7b9 }),
   bathroomTile: new THREE.MeshLambertMaterial({ color: 0xb4b5aa, map: tex.bathroomTile }),
-  dirtyCeramic: new THREE.MeshLambertMaterial({ color: 0xd5cfbd, map: tex.dirtyCeramic }),
+  dirtyCeramic: new THREE.MeshLambertMaterial({ color: 0xcac5b4 }),
   screenGlow: new THREE.MeshBasicMaterial({ color: 0x0c1b27 }),
   roadLine: new THREE.MeshBasicMaterial({ color: 0xd5c46c }),
   tailLight: new THREE.MeshBasicMaterial({ color: 0xb43124 }),
   streetLamp: new THREE.MeshBasicMaterial({ color: 0xe3c177 }),
   red: new THREE.MeshLambertMaterial({ color: 0x612121 }),
   black: new THREE.MeshLambertMaterial({ color: 0x080808 }),
-  asphalt: new THREE.MeshLambertMaterial({ color: 0x141414, map: tex.roadAsphalt }),
+  asphalt: new THREE.MeshLambertMaterial({ color: 0x141414, map: tex.photoAsphalt }),
+  exteriorPhoto: new THREE.MeshLambertMaterial({ color: 0xb8b8ad, map: tex.photoExterior }),
+  buildingWindowPhoto: new THREE.MeshBasicMaterial({ color: 0x8797a0, map: tex.photoBuildingWindows }),
+  entranceGlassPhoto: new THREE.MeshBasicMaterial({ color: 0x667a79, map: tex.photoEntranceGlass }),
   invisible: new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0 }),
   metal: new THREE.MeshLambertMaterial({ color: 0xc2c0b8, map: tex.metal }),
   stain: new THREE.MeshBasicMaterial({ color: 0x15110d, transparent: true, opacity: 0.36 }),
   glow: new THREE.MeshBasicMaterial({ color: 0xdad2aa }),
   mirror: new THREE.MeshBasicMaterial({ color: 0x14202a }),
-  windowGlass: new THREE.MeshBasicMaterial({ color: 0x1b3344, transparent: true, opacity: 0.46 }),
+  windowGlass: new THREE.MeshBasicMaterial({ color: 0x1b3344, map: tex.photoWindow, transparent: true, opacity: 0.58 }),
   elevator: new THREE.MeshLambertMaterial({ color: 0x586267 }),
   riceLight: new THREE.MeshBasicMaterial({ color: 0xd54a2f }),
 };
@@ -522,7 +541,7 @@ function addWindowViewLayer() {
   box('window passing car red one', new THREE.Vector3(0.08, 0.035, 0.018), new THREE.Vector3(-1.72, 0.92, -5.35), mat.tailLight, root, false);
   box('window passing car red two', new THREE.Vector3(0.08, 0.035, 0.018), new THREE.Vector3(-1.48, 0.93, -5.35), mat.tailLight, root, false);
   box('window street lamp smear', new THREE.Vector3(0.07, 0.22, 0.018), new THREE.Vector3(-1.35, 1.22, -5.35), mat.streetLamp, root, false);
-  box('window opposite building slice', new THREE.Vector3(0.44, 0.7, 0.02), new THREE.Vector3(-1.58, 1.63, -5.39), mat.concrete, root, false);
+  box('window opposite building slice', new THREE.Vector3(0.44, 0.7, 0.02), new THREE.Vector3(-1.58, 1.63, -5.39), mat.exteriorPhoto, root, false);
   for (const [x, y] of [
     [-1.68, 1.78],
     [-1.48, 1.78],
@@ -544,7 +563,7 @@ function addWindowExterior() {
   box('outside road lane mark right', new THREE.Vector3(0.08, 0.025, 1.2), new THREE.Vector3(-0.6, -0.02, -7.25), mat.roadLine, outside, false);
   box('outside street lamp pole', new THREE.Vector3(0.05, 1.6, 0.05), new THREE.Vector3(0.66, 0.73, -6.85), mat.metal, outside, false);
   box('outside sodium street lamp', new THREE.Vector3(0.28, 0.12, 0.08), new THREE.Vector3(0.52, 1.45, -6.72), mat.streetLamp, outside, false);
-  box('outside opposite building wall', new THREE.Vector3(4.2, 2.8, 0.12), new THREE.Vector3(-1.55, 1.45, -8.55), mat.concrete, outside, false);
+  box('outside opposite building wall', new THREE.Vector3(4.2, 2.8, 0.12), new THREE.Vector3(-1.55, 1.45, -8.55), mat.exteriorPhoto, outside, false);
   for (const [x, y] of [
     [-2.7, 1.9],
     [-1.55, 1.9],
@@ -553,7 +572,7 @@ function addWindowExterior() {
     [-0.95, 1.08],
   ]) {
     box('outside small window frame', new THREE.Vector3(0.5, 0.38, 0.05), new THREE.Vector3(x, y, -8.45), mat.trim, outside, false);
-    box('outside blue glass', new THREE.Vector3(0.38, 0.26, 0.04), new THREE.Vector3(x, y, -8.41), mat.mirror, outside, false);
+    box('outside blue glass', new THREE.Vector3(0.38, 0.26, 0.04), new THREE.Vector3(x, y, -8.41), mat.buildingWindowPhoto, outside, false);
     box('outside ac unit', new THREE.Vector3(0.46, 0.22, 0.22), new THREE.Vector3(x + 0.42, y - 0.34, -8.37), mat.metal, outside, false);
   }
   box('outside vertical pipe', new THREE.Vector3(0.06, 2.7, 0.08), new THREE.Vector3(0.18, 1.35, -8.33), mat.metal, outside, false);
@@ -644,7 +663,7 @@ function addGoshiwonExterior() {
   box('corridor ceiling', new THREE.Vector3(3.15, 0.1, 9.8), new THREE.Vector3(0, 2.42, 10.9), mat.ceiling);
   box('corridor west wall', new THREE.Vector3(0.14, 2.5, 9.8), new THREE.Vector3(-1.55, 1.25, 10.9), mat.concrete);
   box('corridor east wall', new THREE.Vector3(0.14, 2.5, 9.8), new THREE.Vector3(1.55, 1.25, 10.9), mat.concrete);
-  box('corridor end wall', new THREE.Vector3(3.15, 2.5, 0.14), new THREE.Vector3(0, 1.25, 15.85), mat.concrete);
+  box('corridor end wall', new THREE.Vector3(3.15, 2.5, 0.14), new THREE.Vector3(0, 1.25, 15.85), mat.exteriorPhoto);
   box('corridor room door', new THREE.Vector3(1.16, 2.15, 0.12), new THREE.Vector3(-0.72, 1.08, 6.08), mat.doorDark, root, false);
   box('room number plate', new THREE.Vector3(0.36, 0.16, 0.04), new THREE.Vector3(0.02, 1.72, 6.15), mat.paper, root, false);
   box('room number 204 mark a', new THREE.Vector3(0.05, 0.09, 0.045), new THREE.Vector3(-0.08, 1.72, 6.18), mat.black, root, false);
@@ -693,7 +712,7 @@ function addCorridorDetails() {
   box('elevator red arrow', new THREE.Vector3(0.18, 0.04, 0.045), new THREE.Vector3(1.36, 1.78, 7.0), mat.red, root, false);
   box('corridor cable tray', new THREE.Vector3(0.08, 0.08, 8.5), new THREE.Vector3(-1.42, 2.08, 10.8), mat.metal, root, false);
   box('corridor end narrow window frame', new THREE.Vector3(1.05, 0.82, 0.04), new THREE.Vector3(0, 1.58, 15.77), mat.trim, root, false);
-  box('corridor end night window', new THREE.Vector3(0.82, 0.58, 0.035), new THREE.Vector3(0, 1.58, 15.72), mat.windowGlass, root, false);
+  box('corridor end night window', new THREE.Vector3(0.82, 0.58, 0.035), new THREE.Vector3(0, 1.58, 15.72), mat.entranceGlassPhoto, root, false);
   box('corridor end outside road glow', new THREE.Vector3(0.7, 0.08, 0.03), new THREE.Vector3(0, 1.36, 15.69), mat.streetLamp, root, false);
   box('emergency exit sign', new THREE.Vector3(0.58, 0.18, 0.04), new THREE.Vector3(-0.94, 2.02, 7.45), new THREE.MeshBasicMaterial({ color: 0x245f42 }), root, false);
   addFlatFlyers();

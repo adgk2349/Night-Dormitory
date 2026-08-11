@@ -27,7 +27,7 @@ This version focuses on a 10-15 minute vertical slice rather than the full two-h
 - Uses a goshiwon-inspired corridor, nearby elevator, and shared rice-cooker area based on the creator's real spatial memory.
 - Uses provided reference photos to shape the room details and building atmosphere.
 - Uses simple geometry, limited lights, fog, pixelated rendering, and restrained colors to target a low-resource retro horror style.
-- Adds an enterable bathroom and low-resolution generated textures so surfaces read closer to smeared photo references instead of flat color blocks.
+- Adds an enterable bathroom and photo-derived low-resolution textures so walls, curtains, the desk, window glass, asphalt, and exterior surfaces read closer to smeared photo references instead of flat color blocks.
 
 ## Codex Usage
 
@@ -37,6 +37,7 @@ Codex was used for:
 - Designing the RoomState progression and memory-fragment flow.
 - Implementing the browser game prototype.
 - Building the first-person movement, interaction raycast, door/light logic, spatial-change events, and loop ending.
+- Creating a repeatable texture extraction script that compresses the provided reference photos into posterized PSX-style JPG textures.
 - Fixing GitHub Pages asset paths and running build, browser-render, and deployed-link movement verification.
 
 Human decisions:
